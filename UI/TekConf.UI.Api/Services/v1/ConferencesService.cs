@@ -119,6 +119,7 @@ namespace TekConf.UI.Api.Services.v1
                             address = c.address,
                             description = c.description,
                             imageUrl = c.imageUrl,
+                            sessions = c.sessions
                         })
                       .ToList();
                     conferencesDtos = Mapper.Map<List<ConferencesDto>>(conferences);
@@ -176,7 +177,7 @@ namespace TekConf.UI.Api.Services.v1
 
             if (showPastConferences == null || !(bool)showPastConferences)
             {
-                searchBy = c => c.end > DateTime.Now;
+                searchBy = c => c.end > DateTime.Now.AddDays(1);
             }
 
             return searchBy;

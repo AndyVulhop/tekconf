@@ -84,6 +84,7 @@
                                         var sessionTimes = dayGroup.Sessions
                                             .GroupBy(s => new { s.start })
                                             .Select(s => new { DateKey = s.Key, Sessions = s })
+                                            .OrderBy(s => s.DateKey.start)
                                             .ToList();
                                     }
                                     @foreach (var sessionTime in sessionTimes)
@@ -95,7 +96,7 @@
                                         {
                                 
                                         <tr>
-                                            <td><a href="#" class="btn btn-mini btn-inverse">Add to Schedule</a></td>
+                                            <td style="width:84px;"><a href="#" class="btn btn-mini btn-inverse">Add to Schedule</a></td>
                                             <td>
                                                 @Html.RouteLink(session.title, "SessionDetail", new { conferenceSlug = Model.slug, sessionSlug = session.slug }, null)
                                             </td>
@@ -185,8 +186,11 @@
                                 <img src="~/img/social/linkedin-16x16.png" /> @HtmlHelpers.SimpleLink(Model.linkedInUrl, "LinkedIn")<br />
                             }
                         </p>
-                        @Html.RouteLink("Edit Conference", "AdminEditConference", new { conferenceSlug = Model.slug}, new { @class = "btn btn-info" })	
-                        @Html.RouteLink("Add Session", "AdminAddSession", new { conferenceSlug = Model.slug}, new { @class = "btn" })	
+                        @if (Request.QueryString["admin"] != null && Request.QueryString["admin"] == "true")
+                        {
+                            @Html.RouteLink("Edit Conference", "AdminEditConference", new { conferenceSlug = Model.slug}, new { @class = "btn btn-info" })	
+                            @Html.RouteLink("Add Session", "AdminAddSession", new { conferenceSlug = Model.slug}, new { @class = "btn" })	
+                        }
                         <br/>
                     </div>
                     <!-- /sidebar -->
