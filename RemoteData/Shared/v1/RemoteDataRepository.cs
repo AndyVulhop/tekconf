@@ -151,18 +151,6 @@ namespace TekConf.RemoteData.v1
             ServiceClient.PutAsync(conference, callback, (r, ex) => { callback(null); });
         }
 
-        public void CreateUser(string userName, Action<UserDto> callback)
-        {
-            //ServiceClient.PostAsync(new User() {userName = userName}, callback, (r, ex) => { callback(null); });
-            var user = new UserDto() { userName = userName };
-            callback(user);
-        }
-
-        public void GetUser(string userName, Action<UserDto> callback)
-        {
-            ServiceClient.GetAsync(new User() { userName = userName }, callback, (r, ex) => { callback(null); });
-        }
-
         public void AddSessionToConference(AddSession session, Action<SessionDto> callback)
         {
             session.slug = session.title.GenerateSlug();

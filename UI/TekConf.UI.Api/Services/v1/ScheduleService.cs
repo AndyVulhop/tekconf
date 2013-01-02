@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using AutoMapper;
+using ServiceStack.ServiceInterface;
 using TekConf.RemoteData.Dtos.v1;
 using TekConf.UI.Api.Services;
 using TekConf.UI.Api.Services.Requests.v1;
@@ -14,76 +15,75 @@ using ServiceStack.ServiceHost;
 
 namespace TekConf.UI.Api.v1
 {
-    public class ScheduleService : MongoServiceBase
-    {
-        public ICacheClient CacheClient { get; set; }
+	public class ScheduleService : MongoServiceBase
+	{
+		public ICacheClient CacheClient { get; set; }
 
-        public object Get(Schedule request)
-        {
-            if (request.conferenceSlug == default(string) || request.authenticationMethod == default(string) || request.authenticationToken == default(string))
-            {
-                return new HttpError() { StatusCode = HttpStatusCode.BadRequest };
-            }
+		public object Get(Schedule request)
+		{
+			var session = this.GetSession();
+			var x = session.UserName;
+			if (request.conferenceSlug == default(string))
+			{
+				return new HttpError() { StatusCode = HttpStatusCode.BadRequest };
+			}
 
-            return GetSingleSchedule(request);
-        }
+			return GetSchedule(request);
+		}
 
-        public object Post(AddSessionToSchedule request)
-        {
-            var scheduleCollection = this.RemoteDatabase.GetCollection<ScheduleEntity>("schedules");
-            ScheduleEntity schedule = scheduleCollection.AsQueryable()
-                .Where(s => s.ConferenceSlug.ToLower() == request.conferenceSlug.ToLower())
-                .Where(s => s.AuthenticationMethod.ToLower() == request.authenticationMethod.ToLower())
-                .SingleOrDefault(s => s.AuthenticationToken.ToLower() == request.authenticationToken.ToLower());
+		public object Post(AddSessionToSchedule request)
+		{
+			var session = this.GetSession();
 
-            if (schedule == null)
-            {
-                schedule = new ScheduleEntity()
-                               {
-                                   _id = Guid.NewGuid(),
-                                   AuthenticationMethod = request.authenticationMethod,
-                                   AuthenticationToken = request.authenticationToken,
-                                   ConferenceSlug = request.conferenceSlug,
-                                   SessionSlugs = new List<string>(),
-                               };
-            }
-            var conferenceCollection = this.RemoteDatabase.GetCollection<ConferenceEntity>("conferences");
+			var scheduleCollection = this.RemoteDatabase.GetCollection<ScheduleEntity>("schedules");
+			ScheduleEntity schedule = scheduleCollection.AsQueryable()
+					.Where(s => s.ConferenceSlug.ToLower() == request.conferenceSlug.ToLower())
+					.SingleOrDefault(s => s.UserName.ToLower() == session.UserName.ToLower());
 
-            var conference =
-                conferenceCollection.AsQueryable()
-                .SingleOrDefault(c => c.slug == request.conferenceSlug);
+			if (schedule == null)
+			{
+				schedule = new ScheduleEntity()
+											 {
+												 _id = Guid.NewGuid(),
+												 ConferenceSlug = request.conferenceSlug,
+												 UserName = session.UserName,
+												 SessionSlugs = new List<string>(),
+											 };
+			}
+			var conferenceCollection = this.RemoteDatabase.GetCollection<ConferenceEntity>("conferences");
 
-            if (conference != null)
-            {
-                if (!string.IsNullOrWhiteSpace(request.sessionSlug) && !schedule.SessionSlugs.Any(s => s == request.sessionSlug))
-                {
-                    schedule.SessionSlugs.Add(request.sessionSlug);
-                }
-            }
+			var conference =
+					conferenceCollection.AsQueryable()
+					.SingleOrDefault(c => c.slug == request.conferenceSlug);
 
-            scheduleCollection.Save(schedule);
+			if (conference != null)
+			{
+				if (!string.IsNullOrWhiteSpace(request.sessionSlug) && !schedule.SessionSlugs.Any(s => s == request.sessionSlug))
+				{
+					schedule.SessionSlugs.Add(request.sessionSlug);
+				}
+			}
 
-            var scheduleDto = Mapper.Map<ScheduleDto>(schedule);
+			scheduleCollection.Save(schedule);
 
-            return scheduleDto;
-        }
+			var scheduleDto = Mapper.Map<ScheduleDto>(schedule);
 
-        private object GetSingleSchedule(Schedule request)
-        {
-            return GetSchedule(request);
-        }
+			return scheduleDto;
+		}
 
-        private ScheduleDto GetSchedule(Schedule request)
-        {
-            var schedule = this.RemoteDatabase.GetCollection<ScheduleEntity>("schedules")
-                               .AsQueryable()
-                               .Where(s => s.ConferenceSlug.ToLower() == request.conferenceSlug.ToLower())
-                               .Where(s => s.AuthenticationMethod.ToLower() == request.authenticationMethod.ToLower())
-                               .SingleOrDefault(s => s.AuthenticationToken.ToLower() == request.authenticationToken.ToLower());
 
-            var scheduleDto = Mapper.Map<ScheduleEntity, ScheduleDto>(schedule);
+		private ScheduleDto GetSchedule(Schedule request)
+		{
+			var session = this.GetSession();
+			var x = session.UserName;
+			var schedule = this.RemoteDatabase.GetCollection<ScheduleEntity>("schedules")
+												 .AsQueryable()
+												 .Where(s => s.ConferenceSlug.ToLower() == request.conferenceSlug.ToLower())
+												 .SingleOrDefault(s => s.UserName.ToLower() == session.UserName.ToLower());
 
-            return scheduleDto;
-        }
-    }
+			var scheduleDto = Mapper.Map<ScheduleEntity, ScheduleDto>(schedule);
+
+			return scheduleDto;
+		}
+	}
 }

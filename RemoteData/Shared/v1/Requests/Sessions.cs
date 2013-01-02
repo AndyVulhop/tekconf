@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using ServiceStack.ServiceHost;
+using ServiceStack.ServiceInterface;
 using TekConf.RemoteData.Dtos.v1;
 
 namespace TekConf.UI.Api.Services.Requests.v1
@@ -21,6 +22,7 @@ namespace TekConf.UI.Api.Services.Requests.v1
 
     [Route("/v1/conferences/{conferenceSlug}/sessions/{slug}", "POST")]
     [Route("/v1/conferences/{conferenceSlug}/sessions/{slug}", "PUT")]
+		[Authenticate]
     public class AddSession : IReturn<SessionDto>
     {
         public string slug { get; set; }
