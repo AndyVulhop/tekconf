@@ -53,7 +53,7 @@ namespace TekConf.RemoteData.v1
 			});
 		}
 
-		public void GetSchedules(string authenticationMethod, string authenticationToken, string userName, string password, Action<List<SchedulesDto>> callback)
+        public void GetSchedules(string authenticationMethod, string authenticationToken, Action<List<SchedulesDto>> callback)
         {
             var schedules = new Schedules() 
             { 
@@ -69,9 +69,11 @@ namespace TekConf.RemoteData.v1
             });
         }
 
-		public void AddSessionToSchedule(string conferenceSlug, string sessionSlug, string userName, string password, Action<ScheduleDto> callback)
+		public void AddSessionToSchedule(string conferenceSlug, string sessionSlug, string authenticationMethod, string authenticationToken, Action<ScheduleDto> callback)
 		{
 			var schedule = new AddSessionToSchedule() { 
+				authenticationMethod = authenticationMethod, 
+				authenticationToken = authenticationToken, 
 				conferenceSlug = conferenceSlug,
 				sessionSlug = sessionSlug,
 			};
@@ -162,19 +164,14 @@ namespace TekConf.RemoteData.v1
             ServiceClient.PostAsync(conference, callback, (r, ex) => { callback(null); });
         }
 
-		public void EditConference(CreateConference conference, string userName, string password, Action<FullConferenceDto> callback)
+        public void EditConference(CreateConference conference, Action<FullConferenceDto> callback)
         {
 			ServiceClient.SetCredentials(userName, password);
             ServiceClient.PutAsync(conference, callback, (r, ex) => { callback(null); });
         }
 
 
-        public void GetUser(string userName, Action<UserDto> callback)
-        {
-            ServiceClient.GetAsync(new User() { userName = userName }, callback, (r, ex) => { callback(null); });
-        }
-
-		public void AddSessionToConference(AddSession session, string userName, string password, Action<SessionDto> callback)
+        public void AddSessionToConference(AddSession session, Action<SessionDto> callback)
         {
             session.slug = session.title.GenerateSlug();
 			ServiceClient.SetCredentials(userName, password);
@@ -187,7 +184,7 @@ namespace TekConf.RemoteData.v1
             ServiceClient.PutAsync(session, callback, (r, ex) => { callback(null); });
         }
 
-		public void AddSpeakerToSession(CreateSpeaker speaker, string userName, string password, Action<FullSpeakerDto> callback)
+        public void AddSpeakerToSession(CreateSpeaker speaker, Action<FullSpeakerDto> callback)
         {
             speaker.slug = (speaker.firstName.ToLower() + " " + speaker.lastName.ToLower()).GenerateSlug();
 			ServiceClient.SetCredentials(userName, password);

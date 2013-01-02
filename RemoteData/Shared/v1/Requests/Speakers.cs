@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using ServiceStack.ServiceHost;
+using ServiceStack.ServiceInterface;
 using TekConf.RemoteData.Dtos.v1;
 
 namespace TekConf.UI.Api.Services.Requests.v1
@@ -19,6 +20,7 @@ namespace TekConf.UI.Api.Services.Requests.v1
 
     [Route("/v1/conferences/{conferenceSlug}/{sessionSlug}/speakers/{slug}", "POST")]
     [Route("/v1/conferences/{conferenceSlug}/speakers/{slug}", "PUT")]
+		[Authenticate]
     public class CreateSpeaker : IReturn<FullSpeakerDto>
     {
         public string conferenceSlug { get; set; }
