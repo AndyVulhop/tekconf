@@ -19,6 +19,7 @@ namespace TekConf.UI.Api.v1
 	{
 		public ICacheClient CacheClient { get; set; }
 
+		[Authenticate]
 		public object Get(Schedule request)
 		{
 			var session = this.GetSession();
@@ -31,6 +32,7 @@ namespace TekConf.UI.Api.v1
 			return GetSchedule(request);
 		}
 
+		[Authenticate]
 		public object Post(AddSessionToSchedule request)
 		{
 			var session = this.GetSession();

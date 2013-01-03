@@ -6,6 +6,7 @@ using AutoMapper;
 using FluentMongo.Linq;
 using ServiceStack.CacheAccess;
 using ServiceStack.Common.Web;
+using ServiceStack.ServiceInterface;
 using TekConf.RemoteData.Dtos.v1;
 using TekConf.UI.Api.Services.Requests.v1;
 using TekConf.UI.Api.UrlResolvers.v1;
@@ -40,7 +41,8 @@ namespace TekConf.UI.Api.Services.v1
             return GetSingleSession(request);
         }
 
-        public object Post(AddSession request)
+				[Authenticate]
+				public object Post(AddSession request)
         {
             var entity = Mapper.Map<SessionEntity>(request);
 
@@ -65,7 +67,8 @@ namespace TekConf.UI.Api.Services.v1
             return sessionDto;
         }
 
-        public object Put(AddSession request)
+				[Authenticate]
+				public object Put(AddSession request)
         {
             var collection = this.RemoteDatabase.GetCollection<ConferenceEntity>("conferences");
             var conference = collection.AsQueryable().FirstOrDefault(c => c.slug.ToLower() == request.conferenceSlug.ToLower());

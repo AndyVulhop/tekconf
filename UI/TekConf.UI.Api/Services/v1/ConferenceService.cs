@@ -5,6 +5,7 @@ using AutoMapper;
 using FluentMongo.Linq;
 using ServiceStack.CacheAccess;
 using ServiceStack.Common.Web;
+using ServiceStack.ServiceInterface;
 using TekConf.RemoteData.Dtos.v1;
 using TekConf.UI.Api.Services.Requests.v1;
 using ServiceStack.ServiceHost;
@@ -28,7 +29,8 @@ namespace TekConf.UI.Api.Services.v1
             return fullConferenceDto;
         }
 
-        public object Post(CreateSpeaker speaker)
+				[Authenticate]
+				public object Post(CreateSpeaker speaker)
         {
             FullSpeakerDto speakerDto = null;
             try
@@ -88,7 +90,8 @@ namespace TekConf.UI.Api.Services.v1
             return speakerDto;
         }
 
-        public object Put(CreateSpeaker request)
+				[Authenticate]
+				public object Put(CreateSpeaker request)
         {
             var collection = this.RemoteDatabase.GetCollection<ConferenceEntity>("conferences");
             var conference = collection.AsQueryable()
@@ -125,7 +128,8 @@ namespace TekConf.UI.Api.Services.v1
             }
         }
 
-        public object Post(CreateConference conference)
+				[Authenticate]
+				public object Post(CreateConference conference)
         {
             FullConferenceDto conferenceDto = null;
             try
@@ -151,7 +155,8 @@ namespace TekConf.UI.Api.Services.v1
             return conferenceDto;
         }
 
-        public object Put(CreateConference conference)
+				[Authenticate]
+				public object Put(CreateConference conference)
         {
             FullConferenceDto conferenceDto = null;
             try

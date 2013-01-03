@@ -13,6 +13,7 @@ namespace TekConf.UI.Api.v1
     public class SchedulesService : MongoServiceBase
     {
         public ICacheClient CacheClient { get; set; }
+
         public object Get(Schedules request)
         {
 	        var session = this.GetSession();

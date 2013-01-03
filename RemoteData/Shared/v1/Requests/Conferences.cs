@@ -29,7 +29,6 @@ namespace TekConf.UI.Api.Services.Requests.v1
 
 	[Route("/v1/conferences/{slug}", "POST")]
 	[Route("/v1/conferences/{slug}", "PUT")]
-	[Authenticate]
 	public class CreateConference : IReturn<FullConferenceDto>
 	{
 		public string slug { get; set; }
